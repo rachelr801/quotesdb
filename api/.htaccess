@@ -1,0 +1,5 @@
+RewriteEngine On
+
+RewriteRule ^quotes/?$ controllers/quotes.php [L]
+RewriteRule ^authors/?$ controllers/authors.php [L]
+RewriteRule ^categories/?$ controllers/categories.php [L]
