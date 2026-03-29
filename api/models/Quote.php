@@ -16,20 +16,20 @@
 
         // get all
         public function read($params = []) {
-            $query = "SELECT q.id, q.quote, a.author, c.catgory
+            $query = "SELECT q.id, q.quote, a.author, c.category
                     FROM quotes q
                     JOIN authors a ON q.author_id = a.id
                     JOIN categories c ON q.category_id = c.id";
             
             $conditions = [];
             
-            if(isset($params['id'])){
+            if(!empty($params['id'])){
                 $conditions[] = "q.id = :id";
             }
-            if(isset($params['author_id'])){
+            if(!empty($params['author_id'])){
                 $conditions[] = "q.author_id = :author_id";
             }
-            if(isset($params['category_id'])){
+            if(!empty($params['category_id'])){
                 $conditions[] = "q.category_id = :category_id";
             }
 
@@ -47,33 +47,36 @@
             return $stmt;
         }
 
-        public function create($data){
-            $stmt = $this->conn->prepare(
-                "INSERT INTO quotes (quote, author_id, category_id) VALUES (?, ?, ?)"
-            );
+    	// create
+        public function create(){
+            $query = "INSERT INTO quotes (quote, author_id, category_id) VALUES (:quote, :author_id, :category_id)";
+            $stmt = $this->conn->prepare
             
-            $stmt->execute([$data->quote, $data->author_id, $data->category_id]);
-            return $this->conn->lastInsertId();
-        }
-
-        public function update($data){
-            $stmt = $this->conn->prepare(
-                "UPDATE quotes SET quote=?, author_id=?, category_id=?, WHERE id=?"
-            );
-
-            $stmt->execute([
-                $data->quote,
-                $data->author_id,
-                $data->category_id,
-                $data->id
+            return $stmt->execute([
+                ':quote' => $this->quote,
+                ':author_id' => $this->author_id,
+                ':category_id' => $this->category_id
             ]);
-
-            return $stmt->rowCount();
         }
 
-        public function delete($id){
-            $stmt = $this->conn->prepare("DELETE FROM quotes WHERE id=-?");
-            $stmt->execute([$id]);
-            return $stmt->rowCount();
+    	// update
+        public function update(){
+            $query = "UPDATE quotes
+            		  SET quote=:quote, author_id=:author_id, category_id=:category_id
+                      WHERE id=:id";
+            $stmt = $this->conn->prepare($query);
+            
+            return $stmt->execute([
+                ':id' => $this->id,
+                ':quote' => $this->quote,
+                ':author_id' => $this->author_id,
+                ':category_id' => $this->category_id               
+            ]);
+        }
+
+    	// delete
+        public function delete(){
+            $query = "DELETE FROM quotes WHERE id = :id";
+            $stmt = $this->execute([':id' => $this->id])
         }
     }

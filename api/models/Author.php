@@ -1,39 +1,67 @@
 <?php
 class Author {
     private $conn;
-
+    private $table = "authors";
+    
+    public $id;
+    public $author;
+    
     public function __construct($db){
         $this->conn = $db;
     }
 
+    // get
     public function read($id = null){
-        $query = "SELECT id, author FROM authors";
+        $query = "SELECT id, author FROM " . $this->table;
 
-        if($id) {
-            $query .= " WHERE id = ?";
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute([$id]);
-        } else{
-            $stmt = $this->conn->query($query);
+        if ($id) {
+            $query .= " WHERE id = :id";
         }
-        
+
+        $stmt = $this->conn->prepare($query);
+
+        if ($id) {
+            $stmt->bindParam(":id", $id);
+        }
+
+        $stmt->execute();
         return $stmt;
     }
 
-    public function create($data) {
-        $stmt = $this->conn->prepare("INSERT INTO authors (author) VALUES (?)");
-        $stmt->execute([$data->author]);
-        return $this->conn->lastInsertId();
+    // create
+    public function create() {
+        $query = "INSERT INTO " . $this->table . " (author)
+                  VALUES (:author)";
+
+        $stmt = $this->conn->prepare($query);
+
+        return $stmt->execute([
+            ':author' => $this->author
+        ]);
     }
 
-    public function update($data){
-        $stmt = $this->conn->prepaer("UPDATE authors SET authors=? WHERE id=?");
-        $stmt->execute([$data->author, $data->id]);
-        return $stmt->rowCount();
+    // update
+    public function update() {
+        $query = "UPDATE " . $this->table . "
+                  SET author = :author
+                  WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+
+        return $stmt->execute([
+            ':id' => $this->id,
+            ':author' => $this->author
+        ]);
     }
 
-    public function delete($id){
-        $stmt = $this->conn->prepare("DELETE FROM authors WHERE id=?");
-        return $stmt->rowCount();
+    // delete
+    public function delete() {
+        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+
+        return $stmt->execute([
+            ':id' => $this->id
+        ]);
     }
 }

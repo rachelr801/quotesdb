@@ -1,23 +1,26 @@
 <?php
     class Database{
         //DB params
-        private $host = 'localhost';
-        private $db_name = 'quotesdb';
-        private $username = 'root';
-        private $password = '123456';
-        private $conn;
-
+        private $host = "rwquotes.iceiy.com";
+		private $db_name = " icei_41502759_quotesdb";
+		private $username = "icei_41502759";
+		private $password = "4SKJiZRhy6xf";
+        
         // DB connect
         public function connect() {
-            $this->conn = null;
+            $conn = null;
 
             try {
-                $this->conn = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->db_name, $this->username, $this->password);
-                $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $conn = new PDO(
+                    "mysql:host=$this->host;dbname=$this->db_name",
+                     $this->username,
+                     $this->password
+                );
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch(PDOException $e){
-                echo 'Connection Error: ' . $e->getMessage();
+                echo json_encode(["message" => $e->getMessage()]);
             }
 
-            return $this->conn;
+            return $conn;
         }
     }

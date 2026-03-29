@@ -1,28 +1,67 @@
 <?php
 class Category {
     private $conn;
+    private $table = "categories";
+
+    public $id;
+    public $category;
 
     public function __construct($db) {
         $this->conn = $db;
     }
 
+    // get
     public function read($id = null) {
-        $query = "SELECT id, category FROM categories";
+        $query = "SELECT id, category FROM " . $this->table;
 
-        if($id) {
-            $query .= " WHERE id = ?";
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute([$id]);
-        } else {
-            $stmt = $this->conn->query($query);
+        if ($id) {
+            $query .= " WHERE id = :id";
         }
 
+        $stmt = $this->conn->prepare($query);
+
+        if ($id) {
+            $stmt->bindParam(":id", $id);
+        }
+
+        $stmt->execute();
         return $stmt;
     }
 
-    public function create($data) {
-        $stmt = $this->conn->prepare("INSERT INTO categories (category) VALUES (?)");
-        $stmt->exeucte([$id]);
-        return $stmt->rowCount();
+    // create
+    public function create() {
+        $query = "INSERT INTO " . $this->table . " (category)
+                  VALUES (:category)";
+
+        $stmt = $this->conn->prepare($query);
+
+        return $stmt->execute([
+            ':category' => $this->category
+        ]);
+    }
+
+    // update
+    public function update() {
+        $query = "UPDATE " . $this->table . "
+                  SET category = :category
+                  WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+
+        return $stmt->execute([
+            ':id' => $this->id,
+            ':category' => $this->category
+        ]);
+    }
+
+    // delete
+    public function delete() {
+        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+
+        return $stmt->execute([
+            ':id' => $this->id
+        ]);
     }
 }
