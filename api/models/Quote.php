@@ -77,6 +77,10 @@
     	// delete
         public function delete(){
             $query = "DELETE FROM quotes WHERE id = :id";
-            $stmt = $this->execute([':id' => $this->id]);
+            $stmt = $this->conn->prepare($query);
+
+            return $stmt->execute([
+                ':id' => $this->id
+            ]);
         }
     }
