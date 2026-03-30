@@ -1,29 +1,25 @@
 <?php
 
-// REQUIRED CORS HEADERS
 header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
 
-  header('Content-Type: application/json');
+$method = $_SERVER['REQUEST_METHOD'];
 
-  $method = $_SERVER['REQUEST_METHOD'];
-
-
-
-  if ($method === 'OPTIONS') {
-
+if ($method === 'OPTIONS') {
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-
-    header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
-
+    header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With, Authorization');
+    http_response_code(204);
     exit();
+}
 
-  }
-
-// ROUTING
 switch ($method) {
 
     case 'GET':
-        if (isset($_GET['id'])) {
+        if (
+            isset($_GET['id']) ||
+            isset($_GET['author_id']) ||
+            isset($_GET['category_id'])
+        ) {
             require 'read_single.php';
         } else {
             require 'read.php';
@@ -43,6 +39,7 @@ switch ($method) {
         break;
 
     default:
+        http_response_code(400);
         echo json_encode(["message" => "Invalid Request"]);
         break;
 }

@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: application/json');
 
 include_once '../config/Database.php';
 include_once '../models/Quote.php';
@@ -8,12 +9,13 @@ $db = $database->connect();
 
 $quote = new Quote($db);
 
-// filters
-$params = $_GET;
+// safely handle filters
+$params = $_GET ?? [];
 
+// get results
 $stmt = $quote->read($params);
 
-if ($stmt->rowCount() > 0) {
+if ($stmt && $stmt->rowCount() > 0) {
 
     $quotes_arr = [];
 
@@ -24,5 +26,7 @@ if ($stmt->rowCount() > 0) {
     echo json_encode($quotes_arr);
 
 } else {
-    echo json_encode(["message" => "No Quotes Found"]);
+    echo json_encode([
+        "message" => "quotes Not Found"
+    ]);
 }

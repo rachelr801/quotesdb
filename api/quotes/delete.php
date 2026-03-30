@@ -1,9 +1,11 @@
 <?php
+header("Content-Type: application/json");
+
 $data = json_decode(file_get_contents("php://input"));
 
 if (!isset($data->id)) {
     echo json_encode(["message" => "Missing Required Parameters"]);
-    return;
+    exit();
 }
 
 include_once '../config/Database.php';
@@ -17,10 +19,21 @@ $check = $db->prepare("SELECT id FROM quotes WHERE id=?");
 $check->execute([$data->id]);
 
 if ($check->rowCount() == 0) {
-    echo json_encode(["message" => "No Quotes Found"]);
-    return;
+    echo json_encode(["message" => "quote_id Not Found"]);
+    exit();
 }
 
+$quote->id = $data->id;
+
+if ($quote->delete()) {
+    echo json_encode([
+        "id" => $data->id
+    ]);
+} else {
+    echo json_encode([
+        "message" => "Failed to delete quote"
+    ]);
+}
 $quote->id = $data->id;
 
 if ($quote->delete()) {

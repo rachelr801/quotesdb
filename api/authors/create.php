@@ -1,9 +1,11 @@
 <?php
+header("Content-Type: application/json");
+
 $data = json_decode(file_get_contents("php://input"));
 
-if (!isset($data->author)) {
+if (!isset($data->author) || trim($data->author) === "") {
     echo json_encode(["message" => "Missing Required Parameters"]);
-    return;
+    exit();
 }
 
 include_once '../config/Database.php';
@@ -15,5 +17,12 @@ $author = new Author($db);
 $author->author = $data->author;
 
 if ($author->create()) {
-    echo json_encode(["author" => $data->author]);
+    echo json_encode([
+        "id" => $author->id,
+        "author" => $author->author
+    ]);
+} else {
+    echo json_encode([
+        "message" => "Failed to create author"
+    ]);
 }
