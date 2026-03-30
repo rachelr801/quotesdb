@@ -1,23 +1,19 @@
 FROM php:8.2-apache
 
-#install required system packages and dependencies
+# Install PostgreSQL support
 RUN apt-get update && apt-get install -y libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install pdo pdo_pgsql
 
-#set the working directory coontents into the container at /var/
-WORKDIR /var/www/html
-
-#copy the current directory contents into the container at /var/www/html
-COPY . /var/www/html/
-
-#adding Postgres support:
-RUN docker-php-ext-install pdo_pgsql
-
-# copy custom Apache configuration
-COPY apache.conf /etc/apache2/sites-available/000-default.conf
-
-# enable Apache modules
+# Enable Apache rewrite
 RUN a2enmod rewrite
 
-# expose port 80 to allow incombing connections to the container
+# Set correct document root to /api
+ENV APACHE_DOCUMENT_ROOT /var/www/html/api
+
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+
+# Copy files
+COPY . /var/www/html/
+
 EXPOSE 80

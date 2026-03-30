@@ -1,26 +1,25 @@
 <?php
-    class Database{
-        //DB params
-        private $host = "rwquotes.iceiy.com";
-		private $db_name = " icei_41502759_quotesdb";
-		private $username = "icei_41502759";
-		private $password = "4SKJiZRhy6xf";
-        
-        // DB connect
-        public function connect() {
-            $conn = null;
+class Database {
+    private $host = "dpg-d73jc6gule4c73eijiqg-a.oregon-postgres.render.com";
+    private $db_name = "quotesdb_t5s0";
+    private $username = "quotesdb_t5s0_user";
+    private $password = "tff2mZDrnee2DZBlu5H9FHQCyjD51U3W";
+    private $port = "5432";
 
-            try {
-                $conn = new PDO(
-                    "mysql:host=$this->host;dbname=$this->db_name",
-                     $this->username,
-                     $this->password
-                );
-                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            } catch(PDOException $e){
-                echo json_encode(["message" => $e->getMessage()]);
-            }
+    public function connect() {
+        $conn = null;
 
-            return $conn;
+        try {
+            $conn = new PDO(
+                "pgsql:host=$this->host;port=$this->port;dbname=$this->db_name",
+                $this->username,
+                $this->password
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch(PDOException $e) {
+            echo json_encode(["message" => $e->getMessage()]);
         }
+
+        return $conn;
     }
+}

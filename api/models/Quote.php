@@ -50,7 +50,7 @@
     	// create
         public function create(){
             $query = "INSERT INTO quotes (quote, author_id, category_id) VALUES (:quote, :author_id, :category_id)";
-            $stmt = $this->conn->prepare
+            $stmt = $this->conn->prepare($query);
             
             return $stmt->execute([
                 ':quote' => $this->quote,
@@ -77,6 +77,6 @@
     	// delete
         public function delete(){
             $query = "DELETE FROM quotes WHERE id = :id";
-            $stmt = $this->execute([':id' => $this->id])
+            $stmt = $this->execute([':id' => $this->id]);
         }
     }
