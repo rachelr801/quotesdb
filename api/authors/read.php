@@ -1,36 +1,21 @@
 <?php
 
-require_once "../config/Database.php";
-require_once "../models/Author.php";
+if(isset($_GET['id'])) {
+    $author->id = $_GET['id'];
+    $stmt = $author->read_single();
 
-$database = new Database();
-$db = $database->connect();
-
-$author = new Author($db);
-
-$result = $author->read();
-
-$num = $result->rowCount();
-
-if ($num > 0) {
-
-    $author_arr = [];
-
-    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-
-        $author_arr[] = [
-            "id" => $row['id'],
-            "author" => $row['author']
-        ];
+    if($stmt->rowCount() > 0){
+        echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
+    } else {
+        echo json_encode(['message' => 'author_id Not Found']);
     }
 
-    echo json_encode($author_arr);
-
 } else {
+    $stmt = $author->read();
 
-    echo json_encode([
-        "message" => "author_id Not Found"
-    ]);
+    if($stmt->rowCount() > 0){
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+    } else {
+        echo json_encode(['message' => 'author_id Not Found']);
+    }
 }
-
-exit();

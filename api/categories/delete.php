@@ -1,34 +1,16 @@
 <?php
 
-require_once "../config/Database.php";
-require_once "../models/Category.php";
-
-$database = new Database();
-$db = $database->connect();
-
-$category = new Category($db);
-
 $data = json_decode(file_get_contents("php://input"));
 
-// Validate input
-if (!isset($data->id)) {
-    echo json_encode([
-        "message" => "Missing Required Parameters"
-    ]);
-    exit();
+if(!isset($data->id)){
+    echo json_encode(['message' => 'Missing Required Parameters']);
+    return;
 }
 
 $category->id = $data->id;
 
-// Delete
-if ($category->delete()) {
-    echo json_encode([
-        "id" => $data->id . " deleted"
-    ]);
+if($category->delete() > 0){
+    echo json_encode(['id' => $category->id]);
 } else {
-    echo json_encode([
-        "message" => $data->id . " not deleted"
-    ]);
+    echo json_encode(['message' => 'category_id Not Found']);
 }
-
-exit();

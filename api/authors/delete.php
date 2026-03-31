@@ -1,33 +1,16 @@
 <?php
 
-require_once "../config/Database.php";
-require_once "../models/Author.php";
-
-$database = new Database();
-$db = $database->connect();
-
 $data = json_decode(file_get_contents("php://input"));
 
-// VALIDATION
-if (!isset($data->id)) {
-    echo json_encode([
-        "message" => "Missing Required Parameters"
-    ]);
-    exit();
+if(!isset($data->id)){
+    echo json_encode(['message' => 'Missing Required Parameters']);
+    return;
 }
 
-$author = new Author($db);
 $author->id = $data->id;
 
-//  DELETE
-if ($author->delete()) {
-    echo json_encode([
-        "id" => $data->id
-    ]);
+if($author->delete() > 0){
+    echo json_encode(['id' => $author->id]);
 } else {
-    echo json_encode([
-        "message" => "No Authors Found"
-    ]);
+    echo json_encode(['message' => 'author_id Not Found']);
 }
-
-exit();

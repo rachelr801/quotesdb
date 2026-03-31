@@ -1,29 +1,17 @@
 <?php
 
-require_once "../config/Database.php";
-require_once "../models/Quote.php";
+if(!isset($_GET['id'])){
+    echo json_encode(['message' => 'Missing Required Parameters']);
+    return;
+}
 
-$database = new Database();
-$db = $database->connect();
+$where = "WHERE q.id = ?";
+$params = [$_GET['id']];
 
-$quote = new Quote($db);
+$stmt = $quote->read($where, $params);
 
-$quote->id = isset($_GET['id']) ? $_GET['id'] : die();
-
-$quote->read_single();
-
-$quote_arr = array(
-    'id' => $quote->id,
-    'quote' => $quote->quote,
-    'author' => $quote->author_name,
-    'category' => $quote->category_name
-);
-
-if(isset($quote->id)) {
-    print_r(json_encode($quote_arr));
-    } else {
-        echo json_encode(
-            array("message" => "No Quotes Found"));
-        }
-
-exit();
+if($stmt->rowCount() > 0){
+    echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
+} else {
+    echo json_encode(['message' => 'No Quotes Found']);
+}

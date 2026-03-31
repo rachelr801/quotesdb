@@ -1,29 +1,20 @@
 <?php
-require_once "../config/Database.php";
-require_once "../models/Author.php";
-
-$database = new Database();
-$db = $database->connect();
-
-$author = new Author($db);
 
 $data = json_decode(file_get_contents("php://input"));
 
-$author->id = $data->id;
+if(!isset($data->id) || !isset($data->author)){
+    echo json_encode(['message' => 'Missing Required Parameters']);
+    return;
+}
 
+$author->id = $data->id;
 $author->author = $data->author;
 
-if(isset($author->id) && isset($author->author)){
-    if($author->update()) {
-        echo json_encode(
-            array("id" => $author->id, "author" => $author->author));
-    } else {
-        echo json_encode(
-            array("message" => "Author Not Updated"));
-    }
+if($author->update() > 0){
+    echo json_encode([
+        "id" => $author->id,
+        "author" => $author->author
+    ]);
 } else {
-    echo json_encode(
-        array("message" => "Missing Required Parameters"));
-    }
-    
-exit();
+    echo json_encode(['message' => 'author_id Not Found']);
+}

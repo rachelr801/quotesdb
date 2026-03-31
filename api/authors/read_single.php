@@ -1,26 +1,15 @@
 <?php
-require_once "../config/Database.php";
-require_once "../models/Author.php";
 
-$database = new Database();
-$db = $database->connect();
+if(!isset($_GET['id'])){
+    echo json_encode(['message' => 'Missing Required Parameters']);
+    return;
+}
 
-$author = new Author($db);
+$author->id = $_GET['id'];
+$stmt = $author->read_single();
 
-$author->id = isset($_GET['id']) ? $_GET['id'] : die();
-
-$author->read_single();
-
-$author_arr = array(
-    'id' => $author->id,
-    'author' => $author->author
-);
-
-if(isset($author->id)) {
-print_r(json_encode($author_arr));
+if($stmt->rowCount() > 0){
+    echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
 } else {
-    echo json_encode(
-        array("message" => "authorId Not Found"));
-    }
-
-exit();
+    echo json_encode(['message' => 'author_id Not Found']);
+}

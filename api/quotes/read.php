@@ -1,35 +1,29 @@
 <?php
 
-require_once "../config/Database.php";
-require_once "../models/Quote.php";
+$where = "";
+$params = [];
 
-$database = new Database();
-$db = $database->connect();
-
-$quote = new Quote($db);
-
-$result = $quote->read();
-
-$num = $result->rowCount();
-
-if($num > 0) {
-    $quote_arr = array();
-
-    while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $quote_item = [
-            "id" => $row['id'],
-            "quote" => $row['quote'],
-            "author" => $row['author'],
-            "category" => $row['category']
-];
-
-        array_push($quote_arr, $quote_item);
-    }
-
-    print_r(json_encode($quote_arr));
-} else {
-    echo json_encode(
-        array('message' => 'No Quotes Found'));
+if(isset($_GET['id'])) {
+    $where = "WHERE q.id = ?";
+    $params = [$_GET['id']];
+}
+elseif(isset($_GET['author_id']) && isset($_GET['category_id'])) {
+    $where = "WHERE q.author_id = ? AND q.category_id = ?";
+    $params = [$_GET['author_id'], $_GET['category_id']];
+}
+elseif(isset($_GET['author_id'])) {
+    $where = "WHERE q.author_id = ?";
+    $params = [$_GET['author_id']];
+}
+elseif(isset($_GET['category_id'])) {
+    $where = "WHERE q.category_id = ?";
+    $params = [$_GET['category_id']];
 }
 
-exit();
+$stmt = $quote->read($where, $params);
+
+if($stmt->rowCount() > 0) {
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+} else {
+    echo json_encode(['message' => 'No Quotes Found']);
+}

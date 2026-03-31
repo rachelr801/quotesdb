@@ -1,53 +1,40 @@
 <?php
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
 header('Content-Type: application/json');
 
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'OPTIONS') {
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+    header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
     exit();
 }
 
-$id = $_GET['id'] ?? null;
-$author_id = $_GET['author_id'] ?? null;
-$category_id = $_GET['category_id'] ?? null;
+include_once('../config/Database.php');
+include_once('../models/Category.php');
 
-// Routing
-if ($method === "GET" && !empty($id)) {
-    require_once("./read_single.php");
-    exit();
+$db = (new Database())->connect();
+$category = new Category($db);
+
+switch($method) {
+
+    case 'GET':
+        require 'read.php';
+        break;
+
+    case 'POST':
+        require 'create.php';
+        break;
+
+    case 'PUT':
+        require 'update.php';
+        break;
+
+    case 'DELETE':
+        require 'delete.php';
+        break;
+
+    default:
+        echo json_encode(['message' => 'Invalid Request']);
 }
-
-if ($method === "GET") {
-    require_once("./read.php");
-    exit();
-}
-
-if ($method === "POST") {
-    require_once("./create.php");
-    exit();
-}
-
-if ($method === "PUT") {
-    require_once("./update.php");
-    exit();
-}
-
-if ($method === "DELETE") {
-    require_once("./delete.php");
-    exit();
-}
-
-// fallback
-http_response_code(405);
-echo json_encode([
-    "message" => "Method Not Allowed",
-    "method" => $method
-]);
-exit();
