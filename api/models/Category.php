@@ -15,39 +15,42 @@ class Category {
     }
 
     public function read_single() {
-        $query = "SELECT * FROM categories WHERE id = :id LIMIT 1";
-        $stmt = $this->conn->prepare($query);
+        $stmt = $this->conn->prepare("SELECT * FROM categories WHERE id=:id LIMIT 1");
 
-        $stmt->bindParam(':id', $this->id);
+        $stmt->bindParam(":id", $this->id);
         $stmt->execute();
 
         return $stmt;
     }
 
+    // ✅ CREATE FIX
     public function create() {
-        $query = "INSERT INTO categories (category) VALUES (:category)";
+        $query = "INSERT INTO categories (category)
+                  VALUES (:category)
+                  RETURNING id";
+
         $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":category", $this->category);
 
-        $stmt->bindParam(':category', $this->category);
+        if ($stmt->execute()) {
+            return $stmt->fetch(PDO::FETCH_ASSOC)['id'];
+        }
 
-        return $stmt->execute();
+        return false;
     }
 
     public function update() {
-        $query = "UPDATE categories SET category=:category WHERE id=:id";
-        $stmt = $this->conn->prepare($query);
+        $stmt = $this->conn->prepare("UPDATE categories SET category=:category WHERE id=:id");
 
-        $stmt->bindParam(':id', $this->id);
-        $stmt->bindParam(':category', $this->category);
+        $stmt->bindParam(":id", $this->id);
+        $stmt->bindParam(":category", $this->category);
 
         return $stmt->execute();
     }
 
     public function delete() {
-        $query = "DELETE FROM categories WHERE id=:id";
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->bindParam(':id', $this->id);
+        $stmt = $this->conn->prepare("DELETE FROM categories WHERE id=:id");
+        $stmt->bindParam(":id", $this->id);
 
         return $stmt->execute();
     }

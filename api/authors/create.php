@@ -11,6 +11,15 @@ $data = json_decode(file_get_contents("php://input"));
 
 $author->author = $data->author;
 
+$id = $author->create();
+
+if ($id) {
+    echo json_encode([
+        "id" => $id,
+        "author" => $author->author
+    ]);
+}
+
 if(isset($author->author)) {
     if($author->create()) {
         echo json_encode(

@@ -1,56 +1,55 @@
 <?php
+
 class Author {
     private $conn;
-        
+
     public $id;
     public $author;
-    
-    public function __construct($db){
+
+    public function __construct($db) {
         $this->conn = $db;
     }
 
-    // get
-    public function read(){
-         return $this->conn->query("SELECT * FROM authors ORDER BY id");
+    public function read() {
+        return $this->conn->query("SELECT * FROM authors ORDER BY id");
     }
 
-    public function read_single(){
-        $query "SELECT * FROM authors WHERE id - :id LIMIT 1";
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->bindParam(':id', $this->id);
+    public function read_single() {
+        $stmt = $this->conn->prepare("SELECT * FROM authors WHERE id=:id LIMIT 1");
+        $stmt->bindParam(":id", $this->id);
         $stmt->execute();
 
         return $stmt;
     }
 
-    // create
+    // ✅ CREATE FIX
     public function create() {
-        $query = "INSERT INTO authors (author) VALUES (:author)";
+        $query = "INSERT INTO authors (author)
+                  VALUES (:author)
+                  RETURNING id";
+
         $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":author", $this->author);
 
-        $stmt->bindParam(':author', $this->author);
+        if ($stmt->execute()) {
+            return $stmt->fetch(PDO::FETCH_ASSOC)['id'];
+        }
 
-        return $stmt->execute();
+        return false;
     }
 
-    // update
     public function update() {
-        $query = "UPDATE authors SET author=:author WHERE id=:id";
-        $stmt = $this->conn->prepare($query);
+        $stmt = $this->conn->prepare("UPDATE authors SET author=:author WHERE id=:id");
 
-        $stmt->bindParam(':id', $this->id);
-        $stmt->bindParam(':author', $this->author);
+        $stmt->bindParam(":id", $this->id);
+        $stmt->bindParam(":author", $this->author);
 
         return $stmt->execute();
     }
 
-    // delete
     public function delete() {
-        $query = "DELETE FROM authors WHERE id=:id";
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->bindParam(':id', $this->id);
+        $stmt = $this->conn->prepare("DELETE FROM authors WHERE id=:id");
+        $stmt->bindParam(":id", $this->id);
 
         return $stmt->execute();
     }

@@ -11,6 +11,15 @@ $data = json_decode(file_get_contents("php://input"));
 
 $category->category = $data->category;
 
+$id = $category->create();
+
+if ($id) {
+    echo json_encode([
+        "id" => $id,
+        "category" => $category->category
+    ]);
+}
+
 if(isset($category->category)) {
     if($category->create()) {
         echo json_encode(
