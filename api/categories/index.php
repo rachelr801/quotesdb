@@ -1,26 +1,24 @@
 <?php
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
+header('Content-Type: application/json');
 
-  header('Content-Type: application/json');
+$method = $_SERVER['REQUEST_METHOD'];
 
-  $method = $_SERVER['REQUEST_METHOD'];
-
-
-
-  if ($method === 'OPTIONS') {
-
-    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-
-    header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
-
+if ($method === 'OPTIONS') {
     exit();
+}
 
-  }
-  
-$id = isset($_GET['id']) ? $_GET['id'] : null;
+$id = $_GET['id'] ?? null;
+$author_id = $_GET['author_id'] ?? null;
+$category_id = $_GET['category_id'] ?? null;
 
-// Routing logic
+// Routing
 if ($method === "GET" && !empty($id)) {
     require_once("./read_single.php");
     exit();
@@ -48,5 +46,8 @@ if ($method === "DELETE") {
 
 // fallback
 http_response_code(405);
-echo json_encode(["message" => "Method Not Allowed"]);
+echo json_encode([
+    "message" => "Method Not Allowed",
+    "method" => $method
+]);
 exit();
