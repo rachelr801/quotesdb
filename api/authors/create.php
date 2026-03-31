@@ -1,16 +1,26 @@
 <?php
+
 require_once "../config/Database.php";
-require_once "../models/Quote.php";
+require_once "../models/Author.php";
 
 $database = new Database();
 $db = $database->connect();
 
-$author = new Author($db);
-
 $data = json_decode(file_get_contents("php://input"));
 
+// VALIDATION
+if (!isset($data->author)) {
+    echo json_encode([
+        "message" => "Missing Required Parameters"
+    ]);
+    exit();
+}
+
+// CREATE AUTHOR
+$author = new Author($db);
 $author->author = $data->author;
 
+// PostgreSQL: create() must return id
 $id = $author->create();
 
 if ($id) {
@@ -18,19 +28,10 @@ if ($id) {
         "id" => $id,
         "author" => $author->author
     ]);
+} else {
+    echo json_encode([
+        "message" => "Author Not Created"
+    ]);
 }
 
-if(isset($author->author)) {
-    if($author->create()) {
-        echo json_encode(
-            array('id' => $db->lastInsertId(), 'author' => $author->author));
-    } else {
-        echo json_encode(
-            array("message" => "Author Not Created"));
-    }
-} else {
-    echo json_encode(
-        array("message" => "Missing Required Parameters"));
-    }
-    
 exit();

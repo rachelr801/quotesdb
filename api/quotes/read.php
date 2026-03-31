@@ -16,14 +16,12 @@ if($num > 0) {
     $quote_arr = array();
 
     while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        extract($row);
-        
-        $quote_item = array(
-            'id' => $id,
-            'quote' => $quote,
-            'author' => $author_name,
-            'category' => $category_name
-        );
+        $quote_item = [
+            "id" => $row['id'],
+            "quote" => $row['quote'],
+            "author" => $row['author'],
+            "category" => $row['category']
+];
 
         array_push($quote_arr, $quote_item);
     }

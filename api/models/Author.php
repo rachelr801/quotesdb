@@ -22,7 +22,7 @@ class Author {
         return $stmt;
     }
 
-    // ✅ CREATE FIX
+    // CREATE FIX
     public function create() {
         $query = "INSERT INTO authors (author)
                   VALUES (:author)

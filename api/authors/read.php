@@ -1,6 +1,7 @@
 <?php
+
 require_once "../config/Database.php";
-require_once "../models/Quote.php";
+require_once "../models/Author.php";
 
 $database = new Database();
 $db = $database->connect();
@@ -11,24 +12,25 @@ $result = $author->read();
 
 $num = $result->rowCount();
 
-if($num > 0) {
-    $author_arr = array();
+if ($num > 0) {
 
-    while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        extract($row);
-        
-        $author_item = array(
-            'id' => $id,
-            'author' => $author
-        );
+    $author_arr = [];
 
-        array_push($author_arr, $author_item);
+    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+
+        $author_arr[] = [
+            "id" => $row['id'],
+            "author" => $row['author']
+        ];
     }
 
-    print_r(json_encode($author_arr));
+    echo json_encode($author_arr);
+
 } else {
-    echo json_encode(
-        array('message' => 'authorId Not Found'));
+
+    echo json_encode([
+        "message" => "author_id Not Found"
+    ]);
 }
 
 exit();

@@ -1,6 +1,6 @@
 <?php
 require_once "../config/Database.php";
-require_once "../models/Quote.php";
+require_once "../models/Author.php";
 
 $database = new Database();
 $db = $database->connect();

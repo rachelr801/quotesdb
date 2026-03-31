@@ -1,7 +1,7 @@
 <?php
 
 require_once "../config/Database.php";
-require_once "../models/Quote.php";
+require_once "../models/Category.php";
 
 $database = new Database();
 $db = $database->connect();

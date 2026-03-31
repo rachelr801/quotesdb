@@ -10,14 +10,26 @@ $quote = new Quote($db);
 
 $data = json_decode(file_get_contents("php://input"));
 
+// Validate input
+if (!isset($data->id)) {
+    echo json_encode([
+        "message" => "Missing Required Parameters"
+    ]);
+    exit();
+}
+
 $quote->id = $data->id;
 
-if($quote->delete()) {
-    echo json_encode(
-        array("id" => "{$data->id} deleted"));
+// Delete
+if ($quote->delete()) {
+    echo json_encode([
+        "id" => $data->id,
+        "message" => "Quote deleted"
+    ]);
 } else {
-    echo json_encode(
-        array("message" => "{$data->id} not deleted"));
+    echo json_encode([
+        "message" => "Quote not deleted"
+    ]);
 }
 
 exit();

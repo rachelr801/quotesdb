@@ -1,27 +1,37 @@
 <?php
 
 require_once "../config/Database.php";
-require_once "../models/Quote.php";
+require_once "../models/Category.php";
 
 $database = new Database();
 $db = $database->connect();
 
 $category = new Category($db);
 
-$category->id = isset($_GET['id']) ? $_GET['id'] : die();
+// Validate input
+if (!isset($_GET['id'])) {
+    echo json_encode([
+        "message" => "Missing Required Parameters"
+    ]);
+    exit();
+}
 
-$category->read_single();
+$category->id = $_GET['id'];
 
-$category_arr = array(
-    'id' => $category->id,
-    'category' => $category->category
-);
+// Run query
+$result = $category->read_single();
+$row = $result->fetch(PDO::FETCH_ASSOC);
 
-if(isset($category->id)) {
-    print_r(json_encode($category_arr));
-    } else {
-        echo json_encode(
-            array("message" => "categoryId Not Found"));
-        }
+// Check result
+if ($row) {
+    echo json_encode([
+        "id" => $row['id'],
+        "category" => $row['category']
+    ]);
+} else {
+    echo json_encode([
+        "message" => "category_id Not Found"
+    ]);
+}
 
 exit();
