@@ -1,32 +1,35 @@
 <?php
-header("Content-Type: application/json");
 
-require_once '../config/Database.php';
-require_once '../models/Quote.php';
+include_once '../../config/Database.php';
+include_once '../../models/Quote.php';
 
-$db = new Database();
-$conn = $db->connect();
+$database = new Database();
+$db = $database->connect();
+
+$quote = new Quote($db);
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (!isset($data->quote) || !isset($data->author_id) || !isset($data->category_id)) {
-    echo json_encode(["message" => "Missing Required Parameters"]);
-    exit();
-}
-
-$quote = new Quote($conn);
-
 $quote->quote = $data->quote;
-$quote->author_id = $data->author_id;
-$quote->category_id = $data->category_id;
+$quote->authorId = $data->authorId;
+$quote->categoryId = $data->categoryId;
 
-if ($quote->create()) {
-    echo json_encode([
-        "id" => $conn->lastInsertId(),
-        "quote" => $quote->quote,
-        "author_id" => $quote->author_id,
-        "category_id" => $quote->category_id
-    ]);
+if(isset($quote->quote) && isset($quote->authorId) && isset($quote->categoryId)) {
+    if($quote->create()) {
+        echo json_encode(
+            array(
+                'id' => $db->lastInsertId(),
+                'quote' => $quote->quote,
+                'authorId' => $quote->authorId,
+                'categoryId' => $quote->categoryId)
+            );
+    } else {
+        echo json_encode(
+            array("message" => "Quote Not Created"));
+    }
 } else {
-    echo json_encode(["message" => "Quote not created"]);
-}
+    echo json_encode(
+        array("message" => "Missing Required Parameters"));
+    }
+
+exit();

@@ -1,24 +1,29 @@
 <?php
-header("Content-Type: application/json");
+include_once '../../config/Database.php';
+include_once '../../models/Author.php';
 
-require_once "../config/Database.php";
-require_once "../models/Author.php";
-
-$db = (new Database())->connect();
-$data = json_decode(file_get_contents("php://input"));
-
-if (!isset($data->id, $data->author)) {
-    echo json_encode(["message" => "Missing Required Parameters"]);
-    exit();
-}
+$database = new Database();
+$db = $database->connect();
 
 $author = new Author($db);
+
+$data = json_decode(file_get_contents("php://input"));
+
 $author->id = $data->id;
+
 $author->author = $data->author;
 
-if ($author->update()) {
-    echo json_encode([
-        "id" => $author->id,
-        "author" => $author->author
-    ]);
-}
+if(isset($author->id) && isset($author->author)){
+    if($author->update()) {
+        echo json_encode(
+            array("id" => $author->id, "author" => $author->author));
+    } else {
+        echo json_encode(
+            array("message" => "Author Not Updated"));
+    }
+} else {
+    echo json_encode(
+        array("message" => "Missing Required Parameters"));
+    }
+    
+exit();

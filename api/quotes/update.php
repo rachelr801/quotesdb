@@ -1,29 +1,32 @@
 <?php
-header("Content-Type: application/json");
 
-require_once "../config/Database.php";
-require_once "../models/Quote.php";
+include_once '../../config/Database.php';
+include_once '../../models/Quote.php';
 
-$db = (new Database())->connect();
-$data = json_decode(file_get_contents("php://input"));
-
-if (!isset($data->id, $data->quote, $data->author_id, $data->category_id)) {
-    echo json_encode(["message" => "Missing Required Parameters"]);
-    exit();
-}
+$database = new Database();
+$db = $database->connect();
 
 $quote = new Quote($db);
 
-$quote->id = $data->id;
-$quote->quote = $data->quote;
-$quote->author_id = $data->author_id;
-$quote->category_id = $data->category_id;
+$data = json_decode(file_get_contents("php://input"));
 
-if ($quote->update()) {
-    echo json_encode([
-        "id" => $quote->id,
-        "quote" => $quote->quote,
-        "author_id" => $quote->author_id,
-        "category_id" => $quote->category_id
-    ]);
-}
+$quote->id = $data->id;
+
+$quote->quote = $data->quote;
+$quote->authorId = $data->authorId;
+$quote->categoryId = $data->categoryId;
+
+if(isset($quote->id) && isset($quote->quote) && isset($quote->authorId) && isset($quote->categoryId)) {
+    if($quote->update()) {
+        echo json_encode(
+            array("id" => $quote->id, "quote" => $quote->quote, "authorId" => $quote->authorId, "categoryId" => $quote->categoryId));
+    } else {
+        echo json_encode(
+            array("message" => "No Quotes Found"));
+    }
+} else {
+    echo json_encode(
+        array("message" => "Missing Required Parameters"));
+    }
+
+exit();

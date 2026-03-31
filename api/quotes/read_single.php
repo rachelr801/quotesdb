@@ -1,19 +1,29 @@
 <?php
-header('Content-Type: application/json');
 
-require_once "../config/Database.php";
-require_once "../models/Quote.php";
+include_once '../../config/Database.php';
+include_once '../../models/Quote.php';
 
-$db = (new Database())->connect();
+$database = new Database();
+$db = $database->connect();
+
 $quote = new Quote($db);
 
-$quote->id = $_GET['id'];
+$quote->id = isset($_GET['id']) ? $_GET['id'] : die();
 
-$result = $quote->read_single();
-$row = $result->fetch(PDO::FETCH_ASSOC);
+$quote->read_single();
 
-if ($row) {
-    echo json_encode($row);
-} else {
-    echo json_encode(["message" => "No Quotes Found"]);
-}
+$quote_arr = array(
+    'id' => $quote->id,
+    'quote' => $quote->quote,
+    'author' => $quote->author_name,
+    'category' => $quote->category_name
+);
+
+if(isset($quote->id)) {
+    print_r(json_encode($quote_arr));
+    } else {
+        echo json_encode(
+            array("message" => "No Quotes Found"));
+        }
+
+exit();

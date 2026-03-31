@@ -1,21 +1,34 @@
 <?php
-header("Content-Type: application/json");
+include_once '../../config/Database.php';
+include_once '../../models/Author.php';
 
-require_once "../config/Database.php";
-require_once "../models/Author.php";
+$database = new Database();
+$db = $database->connect();
 
-$db = (new Database())->connect();
 $author = new Author($db);
 
 $result = $author->read();
 
-$data = [];
+$num = $result->rowCount();
 
-while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-    $data[] = [
-        "id" => $row["id"],
-        "author" => $row["author"]
-    ];
+if($num > 0) {
+    $author_arr = array();
+
+    while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        extract($row);
+        
+        $author_item = array(
+            'id' => $id,
+            'author' => $author
+        );
+
+        array_push($author_arr, $author_item);
+    }
+
+    print_r(json_encode($author_arr));
+} else {
+    echo json_encode(
+        array('message' => 'authorId Not Found'));
 }
 
-echo json_encode($data);
+exit();

@@ -1,22 +1,23 @@
 <?php
-header("Content-Type: application/json");
 
-require_once "../config/Database.php";
-require_once "../models/Quote.php";
+include_once '../../config/Database.php';
+include_once '../../models/Quote.php';
 
-$db = (new Database())->connect();
-$data = json_decode(file_get_contents("php://input"));
-
-if (!isset($data->id)) {
-    echo json_encode(["message" => "Missing Required Parameters"]);
-    exit();
-}
+$database = new Database();
+$db = $database->connect();
 
 $quote = new Quote($db);
+
+$data = json_decode(file_get_contents("php://input"));
+
 $quote->id = $data->id;
 
-if ($quote->delete()) {
-    echo json_encode(["id" => $data->id]);
+if($quote->delete()) {
+    echo json_encode(
+        array("id" => "{$data->id} deleted"));
 } else {
-    echo json_encode(["message" => "No Quotes Found"]);
+    echo json_encode(
+        array("message" => "{$data->id} not deleted"));
 }
+
+exit();

@@ -1,22 +1,27 @@
 <?php
-header("Content-Type: application/json");
 
-require_once "../config/Database.php";
-require_once "../models/Category.php";
+include_once '../../config/Database.php';
+include_once '../../models/Category.php';
 
-$db = (new Database())->connect();
+$database = new Database();
+$db = $database->connect();
+
 $category = new Category($db);
 
-$category->id = $_GET['id'];
+$category->id = isset($_GET['id']) ? $_GET['id'] : die();
 
-$result = $category->read_single();
-$row = $result->fetch(PDO::FETCH_ASSOC);
+$category->read_single();
 
-if ($row) {
-    echo json_encode([
-        "id" => $row["id"],
-        "category" => $row["category"]
-    ]);
-} else {
-    echo json_encode(["message" => "category_id Not Found"]);
-}
+$category_arr = array(
+    'id' => $category->id,
+    'category' => $category->category
+);
+
+if(isset($category->id)) {
+    print_r(json_encode($category_arr));
+    } else {
+        echo json_encode(
+            array("message" => "categoryId Not Found"));
+        }
+
+exit();

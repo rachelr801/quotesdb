@@ -1,22 +1,22 @@
 <?php
-header("Content-Type: application/json");
+include_once '../../config/Database.php';
+include_once '../../models/Author.php';
 
-require_once "../config/Database.php";
-require_once "../models/Author.php";
-
-$db = (new Database())->connect();
-$data = json_decode(file_get_contents("php://input"));
-
-if (!isset($data->id)) {
-    echo json_encode(["message" => "Missing Required Parameters"]);
-    exit();
-}
+$database = new Database();
+$db = $database->connect();
 
 $author = new Author($db);
+
+$data = json_decode(file_get_contents("php://input"));
+
 $author->id = $data->id;
 
-if ($author->delete()) {
-    echo json_encode(["id" => $data->id]);
+if($author->delete()) {
+    echo json_encode(
+        array("id" => "{$data->id} deleted"));
 } else {
-    echo json_encode(["message" => "No Authors Found"]);
+    echo json_encode(
+        array("message" => "{$data->id} not deleted"));
 }
+
+exit();
