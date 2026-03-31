@@ -4,29 +4,31 @@ header('Content-Type: application/json');
 include_once '../config/Database.php';
 include_once '../models/Quote.php';
 
-$database = new Database();
-$db = $database->connect();
+$db = new Database();
+$conn = $db->connect();
 
-$quote = new Quote($db);
+$quote = new Quote($conn);
 
-// safely handle filters
-$params = $_GET ?? [];
+$result = $quote->read();
 
-// get results
-$stmt = $quote->read($params);
+$num = $result->rowCount();
 
-if ($stmt && $stmt->rowCount() > 0) {
+if ($num > 0) {
 
-    $quotes_arr = [];
+    $arr = [];
 
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $quotes_arr[] = $row;
+    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+
+        $arr[] = [
+            "id" => $row['id'],
+            "quote" => $row['quote'],
+            "author" => $row['author'],
+            "category" => $row['category']
+        ];
     }
 
-    echo json_encode($quotes_arr);
+    echo json_encode($arr);
 
 } else {
-    echo json_encode([
-        "message" => "quotes Not Found"
-    ]);
+    echo json_encode(["message" => "No Quotes Found"]);
 }

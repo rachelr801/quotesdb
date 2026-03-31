@@ -1,26 +1,19 @@
 <?php
 header('Content-Type: application/json');
 
-include_once '../config/Database.php';
-include_once '../models/Quote.php';
+require_once "../config/Database.php";
+require_once "../models/Quote.php";
 
-$database = new Database();
-$db = $database->connect();
-
+$db = (new Database())->connect();
 $quote = new Quote($db);
 
-// validate id
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    echo json_encode(["message" => "Missing Required Parameters"]);
-    exit();
-}
+$quote->id = $_GET['id'];
 
-$params = ['id' => $_GET['id']];
+$result = $quote->read_single();
+$row = $result->fetch(PDO::FETCH_ASSOC);
 
-$stmt = $quote->read($params);
-
-if ($stmt && $stmt->rowCount() > 0) {
-    echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
+if ($row) {
+    echo json_encode($row);
 } else {
-    echo json_encode(["message" => "quote_id Not Found"]);
+    echo json_encode(["message" => "No Quotes Found"]);
 }

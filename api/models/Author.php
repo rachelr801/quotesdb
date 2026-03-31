@@ -1,8 +1,7 @@
 <?php
 class Author {
     private $conn;
-    private $table = "authors";
-    
+        
     public $id;
     public $author;
     
@@ -11,57 +10,48 @@ class Author {
     }
 
     // get
-    public function read($id = null){
-        $query = "SELECT id, author FROM " . $this->table;
+    public function read(){
+         return $this->conn->query("SELECT * FROM authors ORDER BY id");
+    }
 
-        if ($id) {
-            $query .= " WHERE id = :id";
-        }
-
+    public function read_single(){
+        $query "SELECT * FROM authors WHERE id - :id LIMIT 1";
         $stmt = $this->conn->prepare($query);
 
-        if ($id) {
-            $stmt->bindParam(":id", $id);
-        }
-
+        $stmt->bindParam(':id', $this->id);
         $stmt->execute();
+
         return $stmt;
     }
 
     // create
     public function create() {
-        $query = "INSERT INTO " . $this->table . " (author)
-                  VALUES (:author)";
-
+        $query = "INSERT INTO authors (author) VALUES (:author)";
         $stmt = $this->conn->prepare($query);
 
-        return $stmt->execute([
-            ':author' => $this->author
-        ]);
+        $stmt->bindParam(':author', $this->author);
+
+        return $stmt->execute();
     }
 
     // update
     public function update() {
-        $query = "UPDATE " . $this->table . "
-                  SET author = :author
-                  WHERE id = :id";
-
+        $query = "UPDATE authors SET author=:author WHERE id=:id";
         $stmt = $this->conn->prepare($query);
 
-        return $stmt->execute([
-            ':id' => $this->id,
-            ':author' => $this->author
-        ]);
+        $stmt->bindParam(':id', $this->id);
+        $stmt->bindParam(':author', $this->author);
+
+        return $stmt->execute();
     }
 
     // delete
     public function delete() {
-        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
-
+        $query = "DELETE FROM authors WHERE id=:id";
         $stmt = $this->conn->prepare($query);
 
-        return $stmt->execute([
-            ':id' => $this->id
-        ]);
+        $stmt->bindParam(':id', $this->id);
+
+        return $stmt->execute();
     }
 }

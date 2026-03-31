@@ -7,19 +7,13 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'OPTIONS') {
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
-    http_response_code(204);
+    header('Access-Control-Allow-Headers: Content-Type');
     exit();
 }
 
 switch ($method) {
-
     case 'GET':
-        if (
-            isset($_GET['id']) ||
-            isset($_GET['author_id']) ||
-            isset($_GET['category_id'])
-        ) {
+        if (isset($_GET['id'])) {
             require 'read_single.php';
         } else {
             require 'read.php';
@@ -36,10 +30,5 @@ switch ($method) {
 
     case 'DELETE':
         require 'delete.php';
-        break;
-
-    default:
-        http_response_code(400);
-        echo json_encode(["message" => "Invalid Request"]);
         break;
 }

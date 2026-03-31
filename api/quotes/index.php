@@ -1,27 +1,17 @@
 <?php
 
-//  REQUIRED CORS HEADERS
 header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
 
-  header('Content-Type: application/json');
+$method = $_SERVER['REQUEST_METHOD'];
 
-  $method = $_SERVER['REQUEST_METHOD'];
-
-
-
-  if ($method === 'OPTIONS') {
-
+if ($method === 'OPTIONS') {
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-
-    header('Access-Control-Allow-Headers: Origin, Accept, Content-Type, X-Requested-With');
-
+    header('Access-Control-Allow-Headers: Content-Type');
     exit();
+}
 
-  }
-
-// ROUTING
 switch ($method) {
-
     case 'GET':
         if (isset($_GET['id'])) {
             require 'read_single.php';
@@ -40,9 +30,5 @@ switch ($method) {
 
     case 'DELETE':
         require 'delete.php';
-        break;
-
-    default:
-        echo json_encode(["message" => "Invalid Request"]);
         break;
 }

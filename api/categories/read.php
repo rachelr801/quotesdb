@@ -1,26 +1,21 @@
 <?php
 header("Content-Type: application/json");
 
-include_once '../config/Database.php';
-include_once '../models/Category.php';
+require_once "../config/Database.php";
+require_once "../models/Category.php";
 
 $db = (new Database())->connect();
 $category = new Category($db);
 
-$id = isset($_GET['id']) ? $_GET['id'] : null;
+$result = $category->read();
 
-$stmt = $category->read($id);
+$data = [];
 
-if ($stmt && $stmt->rowCount() > 0) {
-    $data = [];
-
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $data[] = $row;
-    }
-
-    echo json_encode($data);
-} else {
-    echo json_encode([
-        "message" => "category_id Not Found"
-    ]);
+while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    $data[] = [
+        "id" => $row["id"],
+        "category" => $row["category"]
+    ];
 }
+
+echo json_encode($data);

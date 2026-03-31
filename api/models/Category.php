@@ -1,7 +1,7 @@
 <?php
+
 class Category {
     private $conn;
-    private $table = "categories";
 
     public $id;
     public $category;
@@ -10,58 +10,45 @@ class Category {
         $this->conn = $db;
     }
 
-    // get
-    public function read($id = null) {
-        $query = "SELECT id, category FROM " . $this->table;
+    public function read() {
+        return $this->conn->query("SELECT * FROM categories ORDER BY id");
+    }
 
-        if ($id) {
-            $query .= " WHERE id = :id";
-        }
-
+    public function read_single() {
+        $query = "SELECT * FROM categories WHERE id = :id LIMIT 1";
         $stmt = $this->conn->prepare($query);
 
-        if ($id) {
-            $stmt->bindParam(":id", $id);
-        }
-
+        $stmt->bindParam(':id', $this->id);
         $stmt->execute();
+
         return $stmt;
     }
 
-    // create
     public function create() {
-        $query = "INSERT INTO " . $this->table . " (category)
-                  VALUES (:category)";
-
+        $query = "INSERT INTO categories (category) VALUES (:category)";
         $stmt = $this->conn->prepare($query);
 
-        return $stmt->execute([
-            ':category' => $this->category
-        ]);
+        $stmt->bindParam(':category', $this->category);
+
+        return $stmt->execute();
     }
 
-    // update
     public function update() {
-        $query = "UPDATE " . $this->table . "
-                  SET category = :category
-                  WHERE id = :id";
-
+        $query = "UPDATE categories SET category=:category WHERE id=:id";
         $stmt = $this->conn->prepare($query);
 
-        return $stmt->execute([
-            ':id' => $this->id,
-            ':category' => $this->category
-        ]);
+        $stmt->bindParam(':id', $this->id);
+        $stmt->bindParam(':category', $this->category);
+
+        return $stmt->execute();
     }
 
-    // delete
     public function delete() {
-        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
-
+        $query = "DELETE FROM categories WHERE id=:id";
         $stmt = $this->conn->prepare($query);
 
-        return $stmt->execute([
-            ':id' => $this->id
-        ]);
+        $stmt->bindParam(':id', $this->id);
+
+        return $stmt->execute();
     }
 }
