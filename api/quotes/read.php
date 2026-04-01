@@ -1,5 +1,12 @@
 <?php
 
+global $quote; // 🔥 FORCE ACCESS TO INDEX SCOPE
+
+if (!isset($quote)) {
+    echo json_encode(["error" => "Quote object not initialized"]);
+    exit();
+}
+
 $where = "";
 $params = [];
 
@@ -22,8 +29,8 @@ elseif(isset($_GET['category_id'])) {
 
 $stmt = $quote->read($where, $params);
 
-if($stmt->rowCount() > 0) {
+if($stmt && $stmt->rowCount() > 0) {
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 } else {
-    echo json_encode(['message' => 'No Quotes Found']);
+    echo json_encode(["message" => "No Quotes Found"]);
 }
