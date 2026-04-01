@@ -1,5 +1,15 @@
 <?php
 
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
+
+include_once '../config/Database.php';
+include_once '../models/Quote.php';
+
+$db = (new Database())->connect();
+
+$quote = new Quote($db);
+
 $data = json_decode(file_get_contents("php://input"));
 
 if(!isset($data->quote) || !isset($data->author_id) || !isset($data->category_id)){

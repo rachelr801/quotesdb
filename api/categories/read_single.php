@@ -1,14 +1,25 @@
 <?php
 
-if(!isset($_GET['id'])){
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
+
+include_once '../config/Database.php';
+include_once '../models/Category.php';
+
+$db = (new Database())->connect();
+
+$category = new Category($db);
+
+if (!isset($_GET['id'])) {
     echo json_encode(['message' => 'Missing Required Parameters']);
-    return;
+    exit();
 }
 
 $category->id = $_GET['id'];
+
 $stmt = $category->read_single();
 
-if($stmt->rowCount() > 0){
+if ($stmt && $stmt->rowCount() > 0) {
     echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
 } else {
     echo json_encode(['message' => 'category_id Not Found']);

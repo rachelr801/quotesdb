@@ -1,4 +1,5 @@
 <?php
+
 class Quote {
     private $conn;
 
@@ -29,6 +30,7 @@ class Quote {
     }
 
     public function create() {
+
         $stmt = $this->conn->prepare(
             "INSERT INTO quotes (quote, author_id, category_id)
              VALUES (:quote, :author_id, :category_id)
@@ -40,13 +42,17 @@ class Quote {
         $stmt->bindParam(':category_id', $this->category_id);
 
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC); // returns ['id' => x]
     }
 
     public function update() {
+
         $stmt = $this->conn->prepare(
             "UPDATE quotes
-             SET quote = :quote, author_id = :author_id, category_id = :category_id
+             SET quote = :quote,
+                 author_id = :author_id,
+                 category_id = :category_id
              WHERE id = :id"
         );
 
@@ -56,13 +62,16 @@ class Quote {
         $stmt->bindParam(':id', $this->id);
 
         $stmt->execute();
-        return $stmt->rowCount();
+
+        return $stmt->rowCount() >= 0;
     }
 
     public function delete() {
+
         $stmt = $this->conn->prepare("DELETE FROM quotes WHERE id = :id");
         $stmt->bindParam(':id', $this->id);
         $stmt->execute();
+
         return $stmt->rowCount();
     }
 }

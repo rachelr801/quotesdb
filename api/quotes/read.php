@@ -1,11 +1,14 @@
 <?php
 
-global $quote; // 🔥 FORCE ACCESS TO INDEX SCOPE
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
 
-if (!isset($quote)) {
-    echo json_encode(["error" => "Quote object not initialized"]);
-    exit();
-}
+include_once '../config/Database.php';
+include_once '../models/Quote.php';
+
+$db = (new Database())->connect();
+
+$quote = new Quote($db);
 
 $where = "";
 $params = [];
